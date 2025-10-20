@@ -28,17 +28,8 @@ export async function POST(request: Request) {
 
     console.log("Search result:", JSON.stringify(result, null, 2));
 
-    // Firecrawl search returns results in different possible formats
-    let results = [];
-    
-    // Try different possible response structures
-    if (result.web && Array.isArray(result.web)) {
-      results = result.web;
-    } else if (result.data && Array.isArray(result.data)) {
-      results = result.data;
-    } else if (Array.isArray(result)) {
-      results = result;
-    }
+    // Firecrawl search returns results in a 'web' array
+    const results = result.web || [];
 
     return NextResponse.json({ results });
   } catch (error) {
