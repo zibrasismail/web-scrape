@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, ExternalLink, FileText, X } from "lucide-react";
+import { Loader2, ExternalLink, FileText, X, Copy, Check } from "lucide-react";
 
 interface SearchResult {
   url: string;
@@ -33,6 +33,16 @@ export function SearchTab() {
   const [scrapedUrl, setScrapedUrl] = useState<string | null>(null);
   const [scrapedContent, setScrapedContent] = useState<ScrapeResult | null>(null);
   const [scrapingUrl, setScrapingUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    const content = scrapedContent?.markdown || scrapedContent?.html;
+    if (content) {
+      await navigator.clipboard.writeText(content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,6 +100,7 @@ export function SearchTab() {
   const closeScrapeResult = () => {
     setScrapedUrl(null);
     setScrapedContent(null);
+    setCopied(false);
   };
 
   return (
@@ -288,7 +299,24 @@ export function SearchTab() {
               </div>
             </div>
 
-            <div className="p-4 border-t border-gray-200 dark:border-gray-800 flex justify-end">
+            <div className="p-4 border-t border-gray-200 dark:border-gray-800 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-1.5"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    Copy Content
+                  </>
+                )}
+              </button>
               <button
                 type="button"
                 onClick={closeScrapeResult}

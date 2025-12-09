@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Plus, X } from "lucide-react";
+import { Loader2, Plus, X, Copy, Check } from "lucide-react";
 
 interface ExtractResult {
   data?: Record<string, unknown>[];
@@ -21,6 +21,15 @@ export function ExtractTab() {
   },
   "required": ["title"]
 }`);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    if (result?.data) {
+      await navigator.clipboard.writeText(JSON.stringify(result.data, null, 2));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const addUrl = () => {
     setUrls([...urls, ""]);
@@ -173,7 +182,26 @@ export function ExtractTab() {
 
       {result?.data && (
         <div>
-          <h3 className="font-semibold mb-2">Extracted Data</h3>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-semibold">Extracted Data</h3>
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-4 h-4 text-green-600" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4" />
+                  Copy
+                </>
+              )}
+            </button>
+          </div>
           <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg max-h-[500px] overflow-auto">
             <pre className="text-sm whitespace-pre-wrap font-mono">
               {JSON.stringify(result.data, null, 2)}

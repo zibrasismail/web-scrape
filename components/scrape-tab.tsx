@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Copy, Check } from "lucide-react";
 
 interface ScrapeResult {
   markdown?: string;
@@ -20,6 +20,16 @@ export function ScrapeTab() {
   const [result, setResult] = useState<ScrapeResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [format, setFormat] = useState<"markdown" | "html">("markdown");
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    const content = result?.markdown || result?.html;
+    if (content) {
+      await navigator.clipboard.writeText(content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const handleScrape = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,7 +148,26 @@ export function ScrapeTab() {
           )}
 
           <div>
-            <h3 className="font-semibold mb-2">Content</h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-semibold">Content</h3>
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-4 h-4 text-green-600" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    Copy
+                  </>
+                )}
+              </button>
+            </div>
             <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg max-h-[500px] overflow-auto">
               <pre className="text-sm whitespace-pre-wrap font-mono">
                 {result.markdown || result.html}
