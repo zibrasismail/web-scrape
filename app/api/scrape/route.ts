@@ -1,32 +1,32 @@
-import Firecrawl from "@mendable/firecrawl-js";
 import { NextResponse } from "next/server";
+import { runShort } from "@/lib/firecrawl-client";
+import { validateUrl } from "@/lib/url-validation";
+import { rateLimitGuard, handleApiError, missingApiKey } from "@/lib/api-helpers";
 
 export async function POST(request: Request) {
+  const rlBlock = rateLimitGuard(request);
+  if (rlBlock) return rlBlock;
+  const keyBlock = missingApiKey();
+  if (keyBlock) return keyBlock;
+
   try {
-    const { url, formats = ["markdown"] } = await request.json();
+    const body = await request.json();
+    const { formats = ["markdown"], onlyMainContent, waitFor, mobile, maxAge } = body;
 
-    if (!url) {
-      return NextResponse.json({ error: "URL is required" }, { status: 400 });
+    const urlCheck = validateUrl(body.url ?? "");
+    if (!urlCheck.valid) {
+      return NextResponse.json({ error: urlCheck.error }, { status: 400 });
     }
 
-    const apiKey = process.env.FIRECRAWL_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "FIRECRAWL_API_KEY not configured" },
-        { status: 500 }
-      );
-    }
+    const opts: Record<string, unknown> = { formats };
+    if (onlyMainContent !== undefined) opts.onlyMainContent = onlyMainContent;
+    if (waitFor) opts.waitFor = waitFor;
+    if (mobile !== undefined) opts.mobile = mobile;
+    if (maxAge) opts.maxAge = maxAge;
 
-    const firecrawl = new Firecrawl({ apiKey });
-
-    const result = await firecrawl.scrape(url, { formats });
-
+    const result = await runShort((sdk) => sdk.scrape(urlCheck.url, opts));
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Scrape error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to scrape URL" },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

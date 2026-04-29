@@ -10,21 +10,23 @@ export async function POST(request: Request) {
   if (keyBlock) return keyBlock;
 
   try {
-    const body = await request.json();
-    const { limit = 10, search, includeSubdomains, sitemap } = body;
+    const { url, formats = ["markdown"] } = await request.json();
 
-    const urlCheck = validateUrl(body.url ?? "");
+    const urlCheck = validateUrl(url ?? "");
     if (!urlCheck.valid) {
       return NextResponse.json({ error: urlCheck.error }, { status: 400 });
     }
 
-    const opts: Record<string, unknown> = { limit: Math.min(Math.max(limit, 1), 100) };
-    if (search) opts.search = search;
-    if (includeSubdomains !== undefined) opts.includeSubdomains = includeSubdomains;
-    if (sitemap) opts.sitemap = sitemap;
+    const result = await runShort((sdk) => sdk.scrape(urlCheck.url, { formats }));
+    const data = result as Record<string, unknown>;
+    const metadata = data.metadata as Record<string, unknown> | undefined;
+    const scrapeId = metadata?.scrapeId as string | undefined;
 
-    const result = await runShort((sdk) => sdk.map(urlCheck.url, opts));
-    return NextResponse.json(result);
+    return NextResponse.json({
+      scrapeId,
+      metadata,
+      markdown: data.markdown,
+    });
   } catch (error) {
     return handleApiError(error);
   }

@@ -1,49 +1,35 @@
-import Firecrawl from "@mendable/firecrawl-js";
 import { NextResponse } from "next/server";
+import { runShort } from "@/lib/firecrawl-client";
+import { validateUrls } from "@/lib/url-validation";
+import { rateLimitGuard, handleApiError, missingApiKey } from "@/lib/api-helpers";
 
 export async function POST(request: Request) {
+  const rlBlock = rateLimitGuard(request);
+  if (rlBlock) return rlBlock;
+  const keyBlock = missingApiKey();
+  if (keyBlock) return keyBlock;
+
   try {
-    const { urls, prompt, schema } = await request.json();
+    const { urls, prompt, schema, enableWebSearch, allowExternalLinks } = await request.json();
 
     if (!urls || urls.length === 0) {
-      return NextResponse.json(
-        { error: "At least one URL is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "At least one URL is required" }, { status: 400 });
     }
 
-    const apiKey = process.env.FIRECRAWL_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "FIRECRAWL_API_KEY not configured" },
-        { status: 500 }
-      );
+    const urlCheck = validateUrls(urls);
+    if (!urlCheck.valid) {
+      return NextResponse.json({ error: urlCheck.error }, { status: 400 });
     }
 
-    const firecrawl = new Firecrawl({ apiKey });
+    const options: Record<string, unknown> = { urls: urlCheck.urls };
+    if (prompt) options.prompt = prompt;
+    if (schema) options.schema = schema;
+    if (enableWebSearch !== undefined) options.enableWebSearch = enableWebSearch;
+    if (allowExternalLinks !== undefined) options.allowExternalLinks = allowExternalLinks;
 
-    const options: {
-      urls: string[];
-      prompt?: string;
-      schema?: Record<string, unknown>;
-    } = { urls };
-
-    if (prompt) {
-      options.prompt = prompt;
-    }
-
-    if (schema) {
-      options.schema = schema;
-    }
-
-    const result = await firecrawl.extract(options);
-
+    const result = await runShort((sdk) => sdk.extract(options));
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Extract error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to extract data" },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
