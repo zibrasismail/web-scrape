@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useHistory } from "@/hooks/use-history";
-import { apiFetch, showApiError } from "@/lib/client-helpers";
+import { apiFetch, normalizeUrl, showApiError } from "@/lib/client-helpers";
 
 export default function MapPanel() {
   const [url, setUrl] = useState("");
@@ -81,9 +81,10 @@ export default function MapPanel() {
           <div className="space-y-2">
             <Label>URL</Label>
             <Input
-              placeholder="https://example.com"
+              placeholder="example.com"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
+              onBlur={() => setUrl((v) => normalizeUrl(v))}
             />
           </div>
           <div className="grid grid-cols-2 gap-4">

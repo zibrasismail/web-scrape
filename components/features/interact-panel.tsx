@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { apiFetch, showApiError } from "@/lib/client-helpers";
+import { apiFetch, normalizeUrl, showApiError } from "@/lib/client-helpers";
 
 export default function InteractPanel() {
   const [url, setUrl] = useState("");
@@ -120,9 +120,10 @@ export default function InteractPanel() {
           <div className="space-y-2">
             <Label>URL</Label>
             <Input
-              placeholder="https://example.com"
+              placeholder="example.com"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
+              onBlur={() => setUrl((v) => normalizeUrl(v))}
               disabled={!!scrapeId}
             />
           </div>

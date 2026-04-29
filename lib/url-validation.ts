@@ -18,11 +18,22 @@ const PRIVATE_RANGES = [
   /^fe80:/i,
 ];
 
+export function normalizeUrl(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed) return trimmed;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (/^http?:\/\//i.test(trimmed)) return trimmed;
+  if (trimmed.startsWith("//")) return `https:${trimmed}`;
+  return `https://${trimmed}`;
+}
+
 export function validateUrl(
   raw: string,
 ): { valid: true; url: string } | { valid: false; error: string } {
   try {
-    const parsed = new URL(raw);
+    const normalized = normalizeUrl(raw);
+    if (!normalized) return { valid: false, error: "URL is required" };
+    const parsed = new URL(normalized);
     if (!["http:", "https:"].includes(parsed.protocol)) {
       return { valid: false, error: "Only http and https URLs are allowed" };
     }

@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useHistory } from "@/hooks/use-history";
-import { apiFetch, showApiError } from "@/lib/client-helpers";
+import { apiFetch, normalizeUrl, showApiError } from "@/lib/client-helpers";
 
 export default function AgentPanel() {
   const [prompt, setPrompt] = useState("");
@@ -100,11 +100,16 @@ export default function AgentPanel() {
             {urls.map((u, i) => (
               <div key={`url-${i}-${u}`} className="flex gap-2">
                 <Input
-                  placeholder="https://example.com"
+                  placeholder="example.com"
                   value={u}
                   onChange={(e) => {
                     const next = [...urls];
                     next[i] = e.target.value;
+                    setUrls(next);
+                  }}
+                  onBlur={() => {
+                    const next = [...urls];
+                    next[i] = normalizeUrl(u);
                     setUrls(next);
                   }}
                 />

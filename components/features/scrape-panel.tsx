@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useHistory } from "@/hooks/use-history";
-import { apiFetch, showApiError } from "@/lib/client-helpers";
+import { apiFetch, normalizeUrl, showApiError } from "@/lib/client-helpers";
 
 const FORMAT_OPTIONS = [
   "markdown",
@@ -129,9 +129,10 @@ export default function ScrapePanel() {
             <Label htmlFor="scrape-url">URL</Label>
             <Input
               id="scrape-url"
-              placeholder="https://example.com"
+              placeholder="example.com"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
+              onBlur={() => setUrl((v) => normalizeUrl(v))}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             />
           </div>
