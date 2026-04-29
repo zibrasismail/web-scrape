@@ -45,8 +45,13 @@ export default function MapPanel() {
         signal: abortRef.current.signal,
       });
 
-      const links: string[] = (data.links || data.urls || []) as string[];
-      setUrls(links);
+      const raw = (data.links || data.urls || []) as unknown[];
+      const links = raw
+        .map((item) =>
+          typeof item === "string" ? item : (item as Record<string, unknown>)?.url,
+        )
+        .filter((v): v is string => typeof v === "string" && v.length > 0);
+      setUrls([...new Set(links)]);
       addEntry({ url, limit }, `${url} (${links.length} URLs)`);
       toast.success(`Found ${links.length} URLs`);
     } catch (err) {
@@ -136,9 +141,9 @@ export default function MapPanel() {
           <CardContent className="p-0">
             <ScrollArea className="h-[400px]">
               <div className="divide-y">
-                {urls.map((u) => (
+                {urls.map((u, i) => (
                   <div
-                    key={u}
+                    key={`${u}-${i}`}
                     className="flex items-center justify-between px-4 py-2 text-sm hover:bg-muted/50"
                   >
                     <span className="truncate mr-2 font-mono text-xs">{u}</span>
