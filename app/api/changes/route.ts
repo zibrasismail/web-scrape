@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
+import {
+  handleApiError,
+  missingApiKey,
+  rateLimitGuard,
+} from "@/lib/api-helpers";
 import { runShort } from "@/lib/firecrawl-client";
 import { validateUrl } from "@/lib/url-validation";
-import { rateLimitGuard, handleApiError, missingApiKey } from "@/lib/api-helpers";
 
 export async function POST(request: Request) {
   const rlBlock = rateLimitGuard(request);
@@ -17,7 +21,7 @@ export async function POST(request: Request) {
     }
 
     const result = await runShort((sdk) =>
-      sdk.scrape(urlCheck.url, { formats: ["markdown", "changeTracking"] })
+      sdk.scrape(urlCheck.url, { formats: ["markdown", "changeTracking"] }),
     );
 
     return NextResponse.json(result);

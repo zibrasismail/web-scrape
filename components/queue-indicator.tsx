@@ -1,9 +1,14 @@
 "use client";
 
+import { Activity } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import { Activity } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface QueueState {
   inFlight: number;
@@ -12,7 +17,11 @@ interface QueueState {
 }
 
 export function QueueIndicator() {
-  const [state, setState] = useState<QueueState>({ inFlight: 0, queued: 0, limit: 2 });
+  const [state, setState] = useState<QueueState>({
+    inFlight: 0,
+    queued: 0,
+    limit: 2,
+  });
 
   useEffect(() => {
     const es = new EventSource("/api/queue/stream");
@@ -31,7 +40,9 @@ export function QueueIndicator() {
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="flex items-center gap-1.5">
-            <Activity className={`h-4 w-4 ${busy ? "text-amber-500 animate-pulse" : "text-muted-foreground"}`} />
+            <Activity
+              className={`h-4 w-4 ${busy ? "text-amber-500 animate-pulse" : "text-muted-foreground"}`}
+            />
             {busy && (
               <Badge variant="warning" className="text-[10px] px-1.5 py-0">
                 {state.inFlight}/{state.limit}

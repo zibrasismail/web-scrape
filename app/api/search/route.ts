@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
+import {
+  handleApiError,
+  missingApiKey,
+  rateLimitGuard,
+} from "@/lib/api-helpers";
 import { runShort } from "@/lib/firecrawl-client";
-import { rateLimitGuard, handleApiError, missingApiKey } from "@/lib/api-helpers";
 
 export async function POST(request: Request) {
   const rlBlock = rateLimitGuard(request);
@@ -12,7 +16,10 @@ export async function POST(request: Request) {
     const { query, limit = 10, scrapeOptions } = await request.json();
 
     if (!query) {
-      return NextResponse.json({ error: "Search query is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Search query is required" },
+        { status: 400 },
+      );
     }
 
     const opts: Record<string, unknown> = {

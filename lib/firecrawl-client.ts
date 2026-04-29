@@ -5,7 +5,9 @@ const apiKey = process.env.FIRECRAWL_API_KEY ?? "";
 
 export const firecrawl = new Firecrawl({ apiKey });
 
-export async function runShort<T>(fn: (sdk: Firecrawl) => Promise<T>): Promise<T> {
+export async function runShort<T>(
+  fn: (sdk: Firecrawl) => Promise<T>,
+): Promise<T> {
   const { release } = await gate.acquire({ timeoutMs: 30_000 });
   try {
     return await fn(firecrawl);
@@ -25,12 +27,21 @@ interface RunJobOpts<TStart, TPoll> {
 }
 
 export async function runJob<TStart, TPoll>(
-  opts: RunJobOpts<TStart, TPoll>
-): Promise<{ startResult: TStart; finalResult: TPoll | null; firecrawlId: string }> {
+  opts: RunJobOpts<TStart, TPoll>,
+): Promise<{
+  startResult: TStart;
+  finalResult: TPoll | null;
+  firecrawlId: string;
+}> {
   const pollInterval = opts.pollIntervalMs ?? 3_000;
-  const maxMs = opts.maxMs ?? Number(process.env.FIRECRAWL_JOB_TIMEOUT_MS ?? 30 * 60 * 1000);
+  const maxMs =
+    opts.maxMs ??
+    Number(process.env.FIRECRAWL_JOB_TIMEOUT_MS ?? 30 * 60 * 1000);
 
-  const { release } = await gate.acquire({ timeoutMs: 30_000, signal: opts.signal });
+  const { release } = await gate.acquire({
+    timeoutMs: 30_000,
+    signal: opts.signal,
+  });
   try {
     const startResult = await opts.start(firecrawl);
     const firecrawlId = opts.getIdFromStart(startResult);

@@ -1,27 +1,34 @@
-# Web Scraper
+# 🕷️ FireScraper
 
-A modern web scraping application powered by Firecrawl API with Next.js and TypeScript.
+A modern web scraping dashboard built with **Next.js 16**, **shadcn/ui**, and the **Firecrawl API**. Supports 10 features — scrape, map, extract, search, agent, parse, interact, crawl, batch scrape, and change tracking — with a built-in concurrency gate, dark mode, job history, and live queue indicator.
 
-## Features
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8)
+![Firecrawl](https://img.shields.io/badge/Firecrawl-API-orange)
+![shadcn/ui](https://img.shields.io/badge/shadcn/ui-latest-white)
 
-- **Scrape**: Extract content from a single URL in markdown or HTML format
-- **Map**: Discover all indexed URLs on a website
-- **Extract**: Extract structured information from web pages using AI
-- **Search**: Search the web and get relevant results with metadata
+## ✨ Features
 
-## Prerequisites
+### 🔍 Scrape
+- Extract content from any URL in multiple formats (markdown, HTML, rawHtml, screenshot, links, JSON)
+- Copy/download results with one click
 
-- Node.js 18+ installed
-- A Firecrawl API key (get one from [firecrawl.dev](https://firecrawl.dev))
+### 🗺️ Map
+- Discover all indexed URLs on a website with optional keyword search filter
+- Configurable limits and subdomain inclusion
 
-## Setup Instructions
+### 📊 Extract
+- Extract structured data from multiple URLs using AI prompts and JSON Schema
+- Supports `enableWebSearch` and `allowExternalLinks`
 
-1. **Clone or navigate to the project directory**
+### 🔎 Search
+- Web search powered by Firecrawl with configurable limits and scrape options
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+### 🤖 Agent
+- AI-powered autonomous web research agent
+- Provide a natural-language prompt and optional starting URLs/schema
+- Returns structured data with credits tracking
 
 ### 📄 Parse
 - Upload local documents (PDF, DOCX, PPTX, CSV, etc.) up to 50 MB
@@ -202,3 +209,4 @@ npm run build
 ### Lint / Format
 ```bash
 npx biome check --write .
+```

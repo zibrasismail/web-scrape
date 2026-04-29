@@ -1,7 +1,12 @@
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 
 export type JobKind = "crawl" | "batch" | "agent";
-export type JobStatus = "queued" | "running" | "completed" | "failed" | "cancelled";
+export type JobStatus =
+  | "queued"
+  | "running"
+  | "completed"
+  | "failed"
+  | "cancelled";
 
 export interface JobRecord {
   id: string;
@@ -39,7 +44,10 @@ export function getJob(id: string): JobRecord | undefined {
   return store.get(id);
 }
 
-export function updateJob(id: string, patch: Partial<Omit<JobRecord, "id" | "kind" | "abort">>) {
+export function updateJob(
+  id: string,
+  patch: Partial<Omit<JobRecord, "id" | "kind" | "abort">>,
+) {
   const job = store.get(id);
   if (!job) return;
   Object.assign(job, patch, { updatedAt: Date.now() });
@@ -64,5 +72,7 @@ export function listJobs(kind?: JobKind): JobRecord[] {
 }
 
 function isTerminal(status: JobStatus) {
-  return status === "completed" || status === "failed" || status === "cancelled";
+  return (
+    status === "completed" || status === "failed" || status === "cancelled"
+  );
 }

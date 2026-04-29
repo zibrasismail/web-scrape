@@ -1,15 +1,21 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { GitCompare, Loader2 } from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/shared/empty-state";
+import { ResultViewer } from "@/components/shared/result-viewer";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ResultViewer } from "@/components/shared/result-viewer";
-import { EmptyState } from "@/components/shared/empty-state";
 import { useHistory } from "@/hooks/use-history";
-import { GitCompare, Loader2 } from "lucide-react";
 
 export default function ChangesPanel() {
   const [url, setUrl] = useState("");
@@ -38,7 +44,9 @@ export default function ChangesPanel() {
       toast.success("Change tracking complete");
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return;
-      toast.error(err instanceof Error ? err.message : "Change tracking failed");
+      toast.error(
+        err instanceof Error ? err.message : "Change tracking failed",
+      );
     } finally {
       setLoading(false);
     }
@@ -48,7 +56,9 @@ export default function ChangesPanel() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Change Tracking</h1>
-        <p className="text-muted-foreground">Track content changes on a webpage over time</p>
+        <p className="text-muted-foreground">
+          Track content changes on a webpage over time
+        </p>
       </div>
 
       <Card>
@@ -72,7 +82,12 @@ export default function ChangesPanel() {
               {loading ? "Tracking..." : "Track Changes"}
             </Button>
             {loading && (
-              <Button variant="outline" onClick={() => abortRef.current?.abort()}>Cancel</Button>
+              <Button
+                variant="outline"
+                onClick={() => abortRef.current?.abort()}
+              >
+                Cancel
+              </Button>
             )}
           </div>
         </CardContent>

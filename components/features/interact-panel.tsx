@@ -1,16 +1,22 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { Loader2, MousePointerClick, Play, Send, Square } from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/shared/empty-state";
+import { ResultViewer } from "@/components/shared/result-viewer";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ResultViewer } from "@/components/shared/result-viewer";
-import { EmptyState } from "@/components/shared/empty-state";
-import { Badge } from "@/components/ui/badge";
-import { MousePointerClick, Loader2, Play, Square, Send } from "lucide-react";
 
 export default function InteractPanel() {
   const [url, setUrl] = useState("");
@@ -47,11 +53,15 @@ export default function InteractPanel() {
         }
         toast.success("Session started");
       } else {
-        toast.error("No scrapeId returned — Interact may not be available for this URL");
+        toast.error(
+          "No scrapeId returned — Interact may not be available for this URL",
+        );
       }
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return;
-      toast.error(err instanceof Error ? err.message : "Failed to start session");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to start session",
+      );
     } finally {
       setLoading(false);
     }
@@ -93,13 +103,17 @@ export default function InteractPanel() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Interact</h1>
-        <p className="text-muted-foreground">Interact with web pages using AI prompts</p>
+        <p className="text-muted-foreground">
+          Interact with web pages using AI prompts
+        </p>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>Session</CardTitle>
-          <CardDescription>Start a browser session to interact with a page</CardDescription>
+          <CardDescription>
+            Start a browser session to interact with a page
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -114,7 +128,11 @@ export default function InteractPanel() {
           <div className="flex gap-2 items-center">
             {!scrapeId ? (
               <Button onClick={startSession} disabled={loading || !url.trim()}>
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
                 {loading ? "Starting..." : "Start Session"}
               </Button>
             ) : (
@@ -157,8 +175,15 @@ export default function InteractPanel() {
               onChange={(e) => setPrompt(e.target.value)}
               rows={3}
             />
-            <Button onClick={sendInteraction} disabled={interacting || !prompt.trim()}>
-              {interacting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            <Button
+              onClick={sendInteraction}
+              disabled={interacting || !prompt.trim()}
+            >
+              {interacting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
               {interacting ? "Interacting..." : "Send"}
             </Button>
           </CardContent>

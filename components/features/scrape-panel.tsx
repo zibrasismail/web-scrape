@@ -1,18 +1,30 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { Globe, History, Loader2, Trash2 } from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/shared/empty-state";
+import { ResultViewer } from "@/components/shared/result-viewer";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ResultViewer } from "@/components/shared/result-viewer";
-import { EmptyState } from "@/components/shared/empty-state";
 import { useHistory } from "@/hooks/use-history";
-import { Globe, Loader2, History, Trash2 } from "lucide-react";
 
-const FORMAT_OPTIONS = ["markdown", "html", "rawHtml", "screenshot", "links", "json"];
+const FORMAT_OPTIONS = [
+  "markdown",
+  "html",
+  "rawHtml",
+  "screenshot",
+  "links",
+  "json",
+];
 
 export default function ScrapePanel() {
   const [url, setUrl] = useState("");
@@ -51,7 +63,7 @@ export default function ScrapePanel() {
 
   const toggleFormat = (fmt: string) => {
     setFormats((prev) =>
-      prev.includes(fmt) ? prev.filter((f) => f !== fmt) : [...prev, fmt]
+      prev.includes(fmt) ? prev.filter((f) => f !== fmt) : [...prev, fmt],
     );
   };
 
@@ -60,9 +72,15 @@ export default function ScrapePanel() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Scrape</h1>
-          <p className="text-muted-foreground">Extract content from a single URL</p>
+          <p className="text-muted-foreground">
+            Extract content from a single URL
+          </p>
         </div>
-        <Button variant="outline" size="sm" onClick={() => setShowHistory(!showHistory)}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowHistory(!showHistory)}
+        >
           <History className="h-4 w-4 mr-1" />
           History
         </Button>
@@ -72,7 +90,12 @@ export default function ScrapePanel() {
         <Card>
           <CardHeader className="py-3 px-4 flex-row items-center justify-between">
             <CardTitle className="text-sm">Recent</CardTitle>
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={clearHistory}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={clearHistory}
+            >
               <Trash2 className="h-3 w-3" />
             </Button>
           </CardHeader>
@@ -80,6 +103,7 @@ export default function ScrapePanel() {
             <div className="space-y-1">
               {entries.slice(0, 5).map((e) => (
                 <button
+                  type="button"
                   key={e.id}
                   className="w-full text-left text-xs truncate px-2 py-1 rounded hover:bg-muted"
                   onClick={() => {
@@ -98,7 +122,9 @@ export default function ScrapePanel() {
       <Card>
         <CardHeader>
           <CardTitle>Configuration</CardTitle>
-          <CardDescription>Enter the URL and select output formats</CardDescription>
+          <CardDescription>
+            Enter the URL and select output formats
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -134,7 +160,10 @@ export default function ScrapePanel() {
               {loading ? "Scraping..." : "Scrape"}
             </Button>
             {loading && (
-              <Button variant="outline" onClick={() => abortRef.current?.abort()}>
+              <Button
+                variant="outline"
+                onClick={() => abortRef.current?.abort()}
+              >
                 Cancel
               </Button>
             )}

@@ -7,9 +7,15 @@ export async function GET() {
 
   const stream = new ReadableStream({
     start(controller) {
-      const send = (state: { inFlight: number; queued: number; limit: number }) => {
+      const send = (state: {
+        inFlight: number;
+        queued: number;
+        limit: number;
+      }) => {
         try {
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify(state)}\n\n`));
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify(state)}\n\n`),
+          );
         } catch {
           unsub();
         }
@@ -32,7 +38,9 @@ export async function GET() {
         unsub();
       };
 
-      (controller as unknown as { signal?: AbortSignal }).signal?.addEventListener("abort", onClose);
+      (
+        controller as unknown as { signal?: AbortSignal }
+      ).signal?.addEventListener("abort", onClose);
     },
   });
 

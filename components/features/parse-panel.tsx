@@ -1,14 +1,20 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { FileUp, Loader2, Upload } from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { ResultViewer } from "@/components/shared/result-viewer";
 import { EmptyState } from "@/components/shared/empty-state";
+import { ResultViewer } from "@/components/shared/result-viewer";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { useHistory } from "@/hooks/use-history";
-import { Upload, Loader2, FileUp } from "lucide-react";
 
 export default function ParsePanel() {
   const [file, setFile] = useState<File | null>(null);
@@ -50,7 +56,9 @@ export default function ParsePanel() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Parse</h1>
-        <p className="text-muted-foreground">Upload and parse documents (PDF, DOCX, etc.) into LLM-ready data</p>
+        <p className="text-muted-foreground">
+          Upload and parse documents (PDF, DOCX, etc.) into LLM-ready data
+        </p>
       </div>
 
       <Card>
@@ -61,12 +69,15 @@ export default function ParsePanel() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label>File</Label>
-            <div
-              className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 cursor-pointer hover:bg-muted/50 transition-colors"
+            <button
+              type="button"
+              className="flex w-full flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 cursor-pointer hover:bg-muted/50 transition-colors"
               onClick={() => inputRef.current?.click()}
             >
               <FileUp className="h-8 w-8 text-muted-foreground mb-2" />
-              <p className="text-sm font-medium">{file ? file.name : "Click to select a file"}</p>
+              <p className="text-sm font-medium">
+                {file ? file.name : "Click to select a file"}
+              </p>
               {file && (
                 <p className="text-xs text-muted-foreground mt-1">
                   {(file.size / 1024 / 1024).toFixed(2)} MB
@@ -79,7 +90,7 @@ export default function ParsePanel() {
                 accept=".pdf,.docx,.doc,.pptx,.xlsx,.csv,.txt,.md,.html"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
               />
-            </div>
+            </button>
           </div>
 
           <div className="flex gap-2">
@@ -88,7 +99,12 @@ export default function ParsePanel() {
               {loading ? "Parsing..." : "Parse Document"}
             </Button>
             {loading && (
-              <Button variant="outline" onClick={() => abortRef.current?.abort()}>Cancel</Button>
+              <Button
+                variant="outline"
+                onClick={() => abortRef.current?.abort()}
+              >
+                Cancel
+              </Button>
             )}
           </div>
         </CardContent>
@@ -98,7 +114,11 @@ export default function ParsePanel() {
         <ResultViewer data={result} />
       ) : (
         !loading && (
-          <EmptyState icon={Upload} title="No results yet" description="Upload a document to parse it into structured data" />
+          <EmptyState
+            icon={Upload}
+            title="No results yet"
+            description="Upload a document to parse it into structured data"
+          />
         )
       )}
     </div>

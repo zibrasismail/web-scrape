@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export interface HistoryEntry {
   id: string;
@@ -33,7 +33,7 @@ export function useHistory(feature: string) {
         return next;
       });
     },
-    [key]
+    [key],
   );
 
   const clearHistory = useCallback(() => {

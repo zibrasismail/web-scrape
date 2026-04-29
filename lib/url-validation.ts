@@ -18,7 +18,9 @@ const PRIVATE_RANGES = [
   /^fe80:/i,
 ];
 
-export function validateUrl(raw: string): { valid: true; url: string } | { valid: false; error: string } {
+export function validateUrl(
+  raw: string,
+): { valid: true; url: string } | { valid: false; error: string } {
   try {
     const parsed = new URL(raw);
     if (!["http:", "https:"].includes(parsed.protocol)) {
@@ -30,7 +32,10 @@ export function validateUrl(raw: string): { valid: true; url: string } | { valid
     }
     for (const re of PRIVATE_RANGES) {
       if (re.test(hostname)) {
-        return { valid: false, error: "Access to private network ranges is not allowed" };
+        return {
+          valid: false,
+          error: "Access to private network ranges is not allowed",
+        };
       }
     }
     return { valid: true, url: parsed.href };
@@ -39,7 +44,9 @@ export function validateUrl(raw: string): { valid: true; url: string } | { valid
   }
 }
 
-export function validateUrls(urls: string[]): { valid: true; urls: string[] } | { valid: false; error: string } {
+export function validateUrls(
+  urls: string[],
+): { valid: true; urls: string[] } | { valid: false; error: string } {
   const cleaned: string[] = [];
   for (const u of urls) {
     const result = validateUrl(u);

@@ -1,15 +1,21 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { ExternalLink, Loader2, Search } from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { EmptyState } from "@/components/shared/empty-state";
 import { useHistory } from "@/hooks/use-history";
-import { Search, Loader2, ExternalLink } from "lucide-react";
 
 interface SearchResult {
   title?: string;
@@ -55,7 +61,9 @@ export default function SearchPanel() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Search</h1>
-        <p className="text-muted-foreground">Search the web and get structured results</p>
+        <p className="text-muted-foreground">
+          Search the web and get structured results
+        </p>
       </div>
 
       <Card>
@@ -75,7 +83,13 @@ export default function SearchPanel() {
           </div>
           <div className="space-y-2">
             <Label>Limit</Label>
-            <Input type="number" min={1} max={20} value={limit} onChange={(e) => setLimit(Number(e.target.value))} />
+            <Input
+              type="number"
+              min={1}
+              max={20}
+              value={limit}
+              onChange={(e) => setLimit(Number(e.target.value))}
+            />
           </div>
           <div className="flex gap-2">
             <Button onClick={handleSubmit} disabled={loading || !query.trim()}>
@@ -83,7 +97,12 @@ export default function SearchPanel() {
               {loading ? "Searching..." : "Search"}
             </Button>
             {loading && (
-              <Button variant="outline" onClick={() => abortRef.current?.abort()}>Cancel</Button>
+              <Button
+                variant="outline"
+                onClick={() => abortRef.current?.abort()}
+              >
+                Cancel
+              </Button>
             )}
           </div>
         </CardContent>
@@ -97,18 +116,29 @@ export default function SearchPanel() {
           <CardContent className="p-0">
             <ScrollArea className="h-[500px]">
               <div className="divide-y">
-                {results.map((r, i) => (
-                  <div key={i} className="p-4 hover:bg-muted/50">
+                {results.map((r) => (
+                  <div key={r.url || r.title} className="p-4 hover:bg-muted/50">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <h3 className="font-medium text-sm truncate">{r.title || "Untitled"}</h3>
-                        <p className="text-xs text-muted-foreground truncate mt-0.5">{r.url}</p>
+                        <h3 className="font-medium text-sm truncate">
+                          {r.title || "Untitled"}
+                        </h3>
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">
+                          {r.url}
+                        </p>
                         {r.description && (
-                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{r.description}</p>
+                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                            {r.description}
+                          </p>
                         )}
                       </div>
                       {r.url && (
-                        <a href={r.url} target="_blank" rel="noopener noreferrer" className="shrink-0 mt-0.5">
+                        <a
+                          href={r.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="shrink-0 mt-0.5"
+                        >
                           <ExternalLink className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
                         </a>
                       )}
@@ -121,7 +151,11 @@ export default function SearchPanel() {
         </Card>
       ) : (
         !loading && (
-          <EmptyState icon={Search} title="No results yet" description="Enter a search query to find web content" />
+          <EmptyState
+            icon={Search}
+            title="No results yet"
+            description="Enter a search query to find web content"
+          />
         )
       )}
     </div>

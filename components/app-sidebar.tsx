@@ -1,24 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Logo } from "@/components/logo";
 import {
-  Globe,
-  Map,
-  FileText,
-  Search,
   Bot,
-  Upload,
-  MousePointerClick,
-  Layers,
-  ListChecks,
-  GitCompare,
   ChevronLeft,
   ChevronRight,
+  FileText,
+  GitCompare,
+  Globe,
+  Layers,
+  ListChecks,
+  Map as MapIcon,
+  MousePointerClick,
+  Search,
+  Upload,
 } from "lucide-react";
+import { useState } from "react";
+import { Logo } from "@/components/logo";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
 export type TabId =
   | "scrape"
@@ -40,16 +40,46 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { id: "scrape", label: "Scrape", icon: Globe, description: "Scrape a single URL" },
-  { id: "map", label: "Map", icon: Map, description: "Discover site URLs" },
-  { id: "extract", label: "Extract", icon: FileText, description: "Extract structured data" },
+  {
+    id: "scrape",
+    label: "Scrape",
+    icon: Globe,
+    description: "Scrape a single URL",
+  },
+  { id: "map", label: "Map", icon: MapIcon, description: "Discover site URLs" },
+  {
+    id: "extract",
+    label: "Extract",
+    icon: FileText,
+    description: "Extract structured data",
+  },
   { id: "search", label: "Search", icon: Search, description: "Web search" },
   { id: "agent", label: "Agent", icon: Bot, description: "AI agent research" },
   { id: "parse", label: "Parse", icon: Upload, description: "Parse documents" },
-  { id: "interact", label: "Interact", icon: MousePointerClick, description: "Interact with pages" },
-  { id: "crawl", label: "Crawl", icon: Layers, description: "Crawl entire sites" },
-  { id: "batch", label: "Batch Scrape", icon: ListChecks, description: "Scrape multiple URLs" },
-  { id: "changes", label: "Changes", icon: GitCompare, description: "Track content changes" },
+  {
+    id: "interact",
+    label: "Interact",
+    icon: MousePointerClick,
+    description: "Interact with pages",
+  },
+  {
+    id: "crawl",
+    label: "Crawl",
+    icon: Layers,
+    description: "Crawl entire sites",
+  },
+  {
+    id: "batch",
+    label: "Batch Scrape",
+    icon: ListChecks,
+    description: "Scrape multiple URLs",
+  },
+  {
+    id: "changes",
+    label: "Changes",
+    icon: GitCompare,
+    description: "Track content changes",
+  },
 ];
 
 interface AppSidebarProps {
@@ -64,7 +94,7 @@ export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
     <div
       className={cn(
         "flex flex-col border-r bg-card transition-all duration-200",
-        collapsed ? "w-16" : "w-64"
+        collapsed ? "w-16" : "w-64",
       )}
     >
       <div className="flex h-14 items-center border-b px-4">
@@ -80,7 +110,11 @@ export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
           className={cn("ml-auto h-7 w-7", collapsed && "mx-auto")}
           onClick={() => setCollapsed(!collapsed)}
         >
-          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          {collapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
         </Button>
       </div>
 
@@ -95,13 +129,15 @@ export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
                 variant={isActive ? "secondary" : "ghost"}
                 className={cn(
                   "justify-start gap-3 h-9",
-                  collapsed && "justify-center px-0"
+                  collapsed && "justify-center px-0",
                 )}
                 onClick={() => onTabChange(item.id)}
                 title={collapsed ? item.label : undefined}
               >
                 <Icon className="h-4 w-4 shrink-0" />
-                {!collapsed && <span className="truncate text-sm">{item.label}</span>}
+                {!collapsed && (
+                  <span className="truncate text-sm">{item.label}</span>
+                )}
               </Button>
             );
           })}

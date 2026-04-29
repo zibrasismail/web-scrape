@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
+import {
+  handleApiError,
+  missingApiKey,
+  rateLimitGuard,
+} from "@/lib/api-helpers";
 import { runShort } from "@/lib/firecrawl-client";
 import { validateUrl } from "@/lib/url-validation";
-import { rateLimitGuard, handleApiError, missingApiKey } from "@/lib/api-helpers";
 
 export async function POST(request: Request) {
   const rlBlock = rateLimitGuard(request);
@@ -18,9 +22,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: urlCheck.error }, { status: 400 });
     }
 
-    const opts: Record<string, unknown> = { limit: Math.min(Math.max(limit, 1), 100) };
+    const opts: Record<string, unknown> = {
+      limit: Math.min(Math.max(limit, 1), 100),
+    };
     if (search) opts.search = search;
-    if (includeSubdomains !== undefined) opts.includeSubdomains = includeSubdomains;
+    if (includeSubdomains !== undefined)
+      opts.includeSubdomains = includeSubdomains;
     if (sitemap) opts.sitemap = sitemap;
 
     const result = await runShort((sdk) => sdk.map(urlCheck.url, opts));

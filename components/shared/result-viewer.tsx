@@ -1,10 +1,10 @@
 "use client";
 
+import { Check, Copy, Download } from "lucide-react";
 import { useState } from "react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Copy, Check, Download } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ResultViewerProps {
   data: Record<string, unknown>;
@@ -26,7 +26,9 @@ export function ResultViewer({ data, className }: ResultViewerProps) {
       id: "markdown",
       label: "Markdown",
       content: (
-        <pre className="whitespace-pre-wrap break-words text-sm font-mono p-4">{markdown}</pre>
+        <pre className="whitespace-pre-wrap break-words text-sm font-mono p-4">
+          {markdown}
+        </pre>
       ),
     });
   }
@@ -48,7 +50,9 @@ export function ResultViewer({ data, className }: ResultViewerProps) {
       id: "html",
       label: "HTML",
       content: (
-        <pre className="whitespace-pre-wrap break-words text-sm font-mono p-4">{html}</pre>
+        <pre className="whitespace-pre-wrap break-words text-sm font-mono p-4">
+          {html}
+        </pre>
       ),
     });
   }
@@ -59,7 +63,12 @@ export function ResultViewer({ data, className }: ResultViewerProps) {
       label: "Screenshot",
       content: (
         <div className="p-4 flex justify-center">
-          <img src={screenshot} alt="Screenshot" className="max-w-full rounded-md border" />
+          {/* biome-ignore lint/performance/noImgElement: screenshot is a base64 data URL */}
+          <img
+            src={screenshot}
+            alt="Screenshot"
+            className="max-w-full rounded-md border"
+          />
         </div>
       ),
     });
@@ -92,10 +101,19 @@ export function ResultViewer({ data, className }: ResultViewerProps) {
   const downloadContent = (tabId: string) => {
     let text = "";
     let ext = "txt";
-    if (tabId === "markdown") { text = markdown ?? ""; ext = "md"; }
-    else if (tabId === "html") { text = html ?? ""; ext = "html"; }
-    else if (tabId === "json") { text = JSON.stringify(json, null, 2); ext = "json"; }
-    else { text = JSON.stringify(data, null, 2); ext = "json"; }
+    if (tabId === "markdown") {
+      text = markdown ?? "";
+      ext = "md";
+    } else if (tabId === "html") {
+      text = html ?? "";
+      ext = "html";
+    } else if (tabId === "json") {
+      text = JSON.stringify(json, null, 2);
+      ext = "json";
+    } else {
+      text = JSON.stringify(data, null, 2);
+      ext = "json";
+    }
 
     const blob = new Blob([text], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
@@ -112,7 +130,9 @@ export function ResultViewer({ data, className }: ResultViewerProps) {
         <div className="flex items-center justify-between">
           <TabsList>
             {tabs.map((tab) => (
-              <TabsTrigger key={tab.id} value={tab.id}>{tab.label}</TabsTrigger>
+              <TabsTrigger key={tab.id} value={tab.id}>
+                {tab.label}
+              </TabsTrigger>
             ))}
           </TabsList>
           <div className="flex items-center gap-1">
@@ -122,7 +142,11 @@ export function ResultViewer({ data, className }: ResultViewerProps) {
               className="h-7 w-7"
               onClick={() => copyContent(tabs[0].id)}
             >
-              {copiedTab ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+              {copiedTab ? (
+                <Check className="h-3.5 w-3.5 text-green-500" />
+              ) : (
+                <Copy className="h-3.5 w-3.5" />
+              )}
             </Button>
             <Button
               variant="ghost"

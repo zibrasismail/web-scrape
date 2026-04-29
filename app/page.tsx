@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { AppSidebar, type TabId } from "@/components/app-sidebar";
 import { Topbar } from "@/components/topbar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,7 +11,9 @@ const ExtractPanel = lazy(() => import("@/components/features/extract-panel"));
 const SearchPanel = lazy(() => import("@/components/features/search-panel"));
 const AgentPanel = lazy(() => import("@/components/features/agent-panel"));
 const ParsePanel = lazy(() => import("@/components/features/parse-panel"));
-const InteractPanel = lazy(() => import("@/components/features/interact-panel"));
+const InteractPanel = lazy(
+  () => import("@/components/features/interact-panel"),
+);
 const CrawlPanel = lazy(() => import("@/components/features/crawl-panel"));
 const BatchPanel = lazy(() => import("@/components/features/batch-panel"));
 const ChangesPanel = lazy(() => import("@/components/features/changes-panel"));

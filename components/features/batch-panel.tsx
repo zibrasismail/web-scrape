@@ -1,18 +1,23 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
-import { toast } from "sonner";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { ResultViewer } from "@/components/shared/result-viewer";
-import { EmptyState } from "@/components/shared/empty-state";
-import { useHistory } from "@/hooks/use-history";
 import { ListChecks, Loader2, Square } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { EmptyState } from "@/components/shared/empty-state";
+import { ResultViewer } from "@/components/shared/result-viewer";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import { Textarea } from "@/components/ui/textarea";
+import { useHistory } from "@/hooks/use-history";
 
 interface JobState {
   id: string;
@@ -73,8 +78,10 @@ export default function BatchPanel() {
 
           if (["completed", "failed", "cancelled"].includes(pollData.status)) {
             stopPolling();
-            if (pollData.status === "completed") toast.success("Batch scrape complete");
-            else if (pollData.status === "failed") toast.error(pollData.error || "Batch scrape failed");
+            if (pollData.status === "completed")
+              toast.success("Batch scrape complete");
+            else if (pollData.status === "failed")
+              toast.error(pollData.error || "Batch scrape failed");
           }
         } catch {}
       }, 3000);
@@ -96,13 +103,18 @@ export default function BatchPanel() {
   };
 
   const isRunning = job?.status === "running" || job?.status === "queued";
-  const progress = job?.total && job.completed ? Math.round((job.completed / job.total) * 100) : 0;
+  const progress =
+    job?.total && job.completed
+      ? Math.round((job.completed / job.total) * 100)
+      : 0;
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Batch Scrape</h1>
-        <p className="text-muted-foreground">Scrape multiple URLs in a single job</p>
+        <p className="text-muted-foreground">
+          Scrape multiple URLs in a single job
+        </p>
       </div>
 
       <Card>
@@ -114,7 +126,9 @@ export default function BatchPanel() {
           <div className="space-y-2">
             <Label>URLs (one per line)</Label>
             <Textarea
-              placeholder={"https://example.com/page1\nhttps://example.com/page2\nhttps://example.com/page3"}
+              placeholder={
+                "https://example.com/page1\nhttps://example.com/page2\nhttps://example.com/page3"
+              }
               value={urlsText}
               onChange={(e) => setUrlsText(e.target.value)}
               rows={6}
@@ -122,7 +136,10 @@ export default function BatchPanel() {
             />
           </div>
           <div className="flex gap-2">
-            <Button onClick={handleSubmit} disabled={loading || isRunning || !urlsText.trim()}>
+            <Button
+              onClick={handleSubmit}
+              disabled={loading || isRunning || !urlsText.trim()}
+            >
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
               Start Batch
             </Button>
@@ -139,7 +156,15 @@ export default function BatchPanel() {
         <Card>
           <CardHeader className="py-3 flex-row items-center justify-between">
             <CardTitle className="text-sm">Job Status</CardTitle>
-            <Badge variant={job.status === "completed" ? "success" : job.status === "failed" ? "destructive" : "warning"}>
+            <Badge
+              variant={
+                job.status === "completed"
+                  ? "success"
+                  : job.status === "failed"
+                    ? "destructive"
+                    : "warning"
+              }
+            >
               {job.status}
             </Badge>
           </CardHeader>
@@ -150,7 +175,9 @@ export default function BatchPanel() {
                 {job.completed ?? 0} / {job.total} pages
               </p>
             )}
-            {job.error && <p className="text-xs text-destructive">{job.error}</p>}
+            {job.error && (
+              <p className="text-xs text-destructive">{job.error}</p>
+            )}
           </CardContent>
         </Card>
       )}
@@ -160,7 +187,11 @@ export default function BatchPanel() {
       ) : (
         !isRunning &&
         !loading && (
-          <EmptyState icon={ListChecks} title="No batch job running" description="Enter URLs and start a batch scrape job" />
+          <EmptyState
+            icon={ListChecks}
+            title="No batch job running"
+            description="Enter URLs and start a batch scrape job"
+          />
         )
       )}
     </div>

@@ -7,7 +7,10 @@ const buckets = new Map<string, Bucket>();
 const RATE = 30;
 const WINDOW_MS = 60_000;
 
-export function checkRateLimit(ip: string): { allowed: boolean; retryAfterMs?: number } {
+export function checkRateLimit(ip: string): {
+  allowed: boolean;
+  retryAfterMs?: number;
+} {
   const now = Date.now();
   let bucket = buckets.get(ip);
 

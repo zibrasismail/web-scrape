@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 
 export class QueueTimeoutError extends Error {
   code = "QUEUE_TIMEOUT" as const;
@@ -9,7 +9,11 @@ export class QueueTimeoutError extends Error {
 }
 
 interface Waiter {
-  resolve: (value: { release: () => void; ticket: string; waitedMs: number }) => void;
+  resolve: (value: {
+    release: () => void;
+    ticket: string;
+    waitedMs: number;
+  }) => void;
   reject: (err: Error) => void;
   ticket: string;
   ts: number;
@@ -18,7 +22,11 @@ interface Waiter {
   onAbort?: () => void;
 }
 
-type Listener = (state: { inFlight: number; queued: number; limit: number }) => void;
+type Listener = (state: {
+  inFlight: number;
+  queued: number;
+  limit: number;
+}) => void;
 
 export class FirecrawlGate {
   private limit: number;
@@ -31,7 +39,11 @@ export class FirecrawlGate {
   }
 
   getState() {
-    return { inFlight: this.inFlight, queued: this.queue.length, limit: this.limit };
+    return {
+      inFlight: this.inFlight,
+      queued: this.queue.length,
+      limit: this.limit,
+    };
   }
 
   subscribe(listener: Listener) {
@@ -75,30 +87,32 @@ export class FirecrawlGate {
       });
     }
 
-    return new Promise<{ release: () => void; ticket: string; waitedMs: number }>(
-      (resolve, reject) => {
-        const waiter: Waiter = { resolve, reject, ticket, ts: Date.now() };
+    return new Promise<{
+      release: () => void;
+      ticket: string;
+      waitedMs: number;
+    }>((resolve, reject) => {
+      const waiter: Waiter = { resolve, reject, ticket, ts: Date.now() };
 
-        if (timeoutMs > 0) {
-          waiter.timer = setTimeout(() => {
-            this.removeWaiter(waiter);
-            reject(new QueueTimeoutError(Date.now() - waiter.ts));
-          }, timeoutMs);
-        }
-
-        if (opts?.signal) {
-          waiter.signal = opts.signal;
-          waiter.onAbort = () => {
-            this.removeWaiter(waiter);
-            reject(new DOMException("Aborted", "AbortError"));
-          };
-          opts.signal.addEventListener("abort", waiter.onAbort, { once: true });
-        }
-
-        this.queue.push(waiter);
-        this.notify();
+      if (timeoutMs > 0) {
+        waiter.timer = setTimeout(() => {
+          this.removeWaiter(waiter);
+          reject(new QueueTimeoutError(Date.now() - waiter.ts));
+        }, timeoutMs);
       }
-    );
+
+      if (opts?.signal) {
+        waiter.signal = opts.signal;
+        waiter.onAbort = () => {
+          this.removeWaiter(waiter);
+          reject(new DOMException("Aborted", "AbortError"));
+        };
+        opts.signal.addEventListener("abort", waiter.onAbort, { once: true });
+      }
+
+      this.queue.push(waiter);
+      this.notify();
+    });
   }
 
   private removeWaiter(waiter: Waiter) {

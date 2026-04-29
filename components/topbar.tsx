@@ -1,13 +1,13 @@
 "use client";
 
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Github, Key } from "lucide-react";
 import { QueueIndicator } from "@/components/queue-indicator";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Github, Key } from "lucide-react";
 
 export function Topbar() {
-  const hasKey = typeof window !== "undefined" ? true : true;
+  const hasKey = true;
 
   return (
     <header className="flex h-14 items-center justify-between border-b bg-card px-4">
@@ -22,7 +22,12 @@ export function Topbar() {
         </Badge>
         <ThemeToggle />
         <Button variant="ghost" size="icon" asChild>
-          <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+          <a
+            href="https://github.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+          >
             <Github className="h-4 w-4" />
           </a>
         </Button>
