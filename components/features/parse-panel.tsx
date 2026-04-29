@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useHistory } from "@/hooks/use-history";
+import { showApiError } from "@/lib/client-helpers";
 
 export default function ParsePanel() {
   const [file, setFile] = useState<File | null>(null);
@@ -40,13 +41,15 @@ export default function ParsePanel() {
         signal: abortRef.current.signal,
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Parse failed");
+      if (!res.ok) {
+        const { ApiResponseError } = await import("@/lib/client-helpers");
+        throw new ApiResponseError(res.status, data);
+      }
       setResult(data);
       addEntry({ filename: file.name, size: file.size }, file.name);
       toast.success("Document parsed");
     } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") return;
-      toast.error(err instanceof Error ? err.message : "Parse failed");
+      showApiError(err, "Parse failed");
     } finally {
       setLoading(false);
     }

@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useHistory } from "@/hooks/use-history";
+import { apiFetch, showApiError } from "@/lib/client-helpers";
 
 export default function AgentPanel() {
   const [prompt, setPrompt] = useState("");
@@ -47,7 +48,7 @@ export default function AgentPanel() {
 
       const cleanUrls = urls.map((u) => u.trim()).filter(Boolean);
 
-      const res = await fetch("/api/agent", {
+      const data = await apiFetch<Record<string, unknown>>("/api/agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -57,14 +58,11 @@ export default function AgentPanel() {
         }),
         signal: abortRef.current.signal,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Agent failed");
       setResult(data);
       addEntry({ prompt, urls: cleanUrls }, prompt.slice(0, 60));
       toast.success("Agent research complete");
     } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") return;
-      toast.error(err instanceof Error ? err.message : "Agent failed");
+      showApiError(err, "Agent failed");
     } finally {
       setLoading(false);
     }

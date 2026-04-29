@@ -190,6 +190,7 @@ web-scraper/
 - **Live View**: Embedded iframe for Interact sessions
 - **Lazy Loading**: Feature panels are code-split with React.lazy + Suspense
 - **AbortController**: All client fetches support cancellation
+- **Detailed Error Handling**: All API errors surface Firecrawl status codes, error codes, and response details in toast notifications (with stack traces in dev mode)
 - **SSRF Protection**: All URL inputs validated against internal/private ranges
 - **Rate Limiting**: 30 req/min per IP across all API routes
 
@@ -200,6 +201,20 @@ Ensure `.env.local` exists with a valid API key.
 
 ### "Server busy, please retry" (503 QUEUE_TIMEOUT)
 All concurrency slots are occupied and the queue timed out. Reduce concurrent usage or increase `FIRECRAWL_CONCURRENCY`.
+
+### Error Codes
+
+| Code | Meaning |
+|------|---------|
+| `NO_API_KEY` | `FIRECRAWL_API_KEY` is not set in `.env.local` |
+| `BAD_REQUEST` | Invalid input — check the URL or request body |
+| `AUTH_ERROR` | API key is invalid or expired |
+| `PAYMENT_REQUIRED` | Firecrawl account needs billing update |
+| `FIRECRAWL_RATE_LIMIT` | Hit Firecrawl's rate limit — wait and retry |
+| `FIRECRAWL_SERVER_ERROR` | Firecrawl upstream issue |
+| `QUEUE_TIMEOUT` | Local concurrency gate timed out |
+| `RATE_LIMITED` | Too many requests from your IP (30/min) |
+| `CANCELLED` | Request was cancelled by user |
 
 ### Build Errors
 ```bash

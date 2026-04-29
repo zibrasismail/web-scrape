@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useHistory } from "@/hooks/use-history";
+import { apiFetch, showApiError } from "@/lib/client-helpers";
 
 export default function MapPanel() {
   const [url, setUrl] = useState("");
@@ -33,7 +34,7 @@ export default function MapPanel() {
     abortRef.current = new AbortController();
 
     try {
-      const res = await fetch("/api/map", {
+      const data = await apiFetch<Record<string, unknown>>("/api/map", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -43,16 +44,13 @@ export default function MapPanel() {
         }),
         signal: abortRef.current.signal,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Map failed");
 
-      const links: string[] = data.links || data.urls || [];
+      const links: string[] = (data.links || data.urls || []) as string[];
       setUrls(links);
       addEntry({ url, limit }, `${url} (${links.length} URLs)`);
       toast.success(`Found ${links.length} URLs`);
     } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") return;
-      toast.error(err instanceof Error ? err.message : "Map failed");
+      showApiError(err, "Map failed");
     } finally {
       setLoading(false);
     }

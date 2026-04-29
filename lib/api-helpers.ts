@@ -44,11 +44,67 @@ export function handleApiError(error: unknown): NextResponse {
       { status: 499 },
     );
   }
-  console.error("API error:", error);
-  return NextResponse.json(
-    { error: error instanceof Error ? error.message : "Internal server error" },
-    { status: 500 },
-  );
+
+  const isDev = process.env.NODE_ENV === "development";
+  const details = extractErrorDetails(error);
+  console.error("[API Error]", {
+    message: details.message,
+    code: details.code,
+    statusCode: details.statusCode,
+    firecrawlDetails: details.firecrawlDetails,
+    stack: error instanceof Error ? error.stack : undefined,
+  });
+
+  const status = details.statusCode ?? 500;
+  const body: Record<string, unknown> = {
+    error: details.message,
+    code: details.code,
+  };
+  if (details.firecrawlDetails) body.details = details.firecrawlDetails;
+  if (isDev && error instanceof Error) body.stack = error.stack;
+
+  return NextResponse.json(body, { status });
+}
+
+function extractErrorDetails(error: unknown): {
+  message: string;
+  code: string;
+  statusCode: number | null;
+  firecrawlDetails: unknown;
+} {
+  if (!(error instanceof Error)) {
+    return {
+      message: "Internal server error",
+      code: "UNKNOWN",
+      statusCode: null,
+      firecrawlDetails: null,
+    };
+  }
+
+  const errObj = error as unknown as Record<string, unknown>;
+  const statusCode =
+    typeof errObj.statusCode === "number"
+      ? errObj.statusCode
+      : typeof errObj.status === "number"
+        ? errObj.status
+        : null;
+
+  const firecrawlDetails =
+    errObj.response ?? errObj.body ?? errObj.data ?? null;
+
+  let code = "API_ERROR";
+  if (statusCode === 401 || statusCode === 403) code = "AUTH_ERROR";
+  else if (statusCode === 402) code = "PAYMENT_REQUIRED";
+  else if (statusCode === 429) code = "FIRECRAWL_RATE_LIMIT";
+  else if (statusCode === 400) code = "BAD_REQUEST";
+  else if (statusCode && statusCode >= 500) code = "FIRECRAWL_SERVER_ERROR";
+
+  return {
+    message: error.message || "Internal server error",
+    code,
+    statusCode,
+    firecrawlDetails,
+  };
 }
 
 export function missingApiKey(): NextResponse | null {

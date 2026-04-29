@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useHistory } from "@/hooks/use-history";
+import { apiFetch, showApiError } from "@/lib/client-helpers";
 
 interface SearchResult {
   title?: string;
@@ -38,20 +39,18 @@ export default function SearchPanel() {
     abortRef.current = new AbortController();
 
     try {
-      const res = await fetch("/api/search", {
+      const data = await apiFetch<Record<string, unknown>>("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: query.trim(), limit }),
         signal: abortRef.current.signal,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Search failed");
-      setResults(data.results || []);
+      const results = (data.results || []) as SearchResult[];
+      setResults(results);
       addEntry({ query, limit }, query);
-      toast.success(`Found ${(data.results || []).length} results`);
+      toast.success(`Found ${results.length} results`);
     } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") return;
-      toast.error(err instanceof Error ? err.message : "Search failed");
+      showApiError(err, "Search failed");
     } finally {
       setLoading(false);
     }

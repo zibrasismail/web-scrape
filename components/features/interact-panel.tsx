@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { apiFetch, showApiError } from "@/lib/client-helpers";
 
 export default function InteractPanel() {
   const [url, setUrl] = useState("");
@@ -37,19 +38,21 @@ export default function InteractPanel() {
     abortRef.current = new AbortController();
 
     try {
-      const res = await fetch("/api/interact/start", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: url.trim(), formats: ["markdown"] }),
-        signal: abortRef.current.signal,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to start session");
+      const data = await apiFetch<Record<string, unknown>>(
+        "/api/interact/start",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: url.trim(), formats: ["markdown"] }),
+          signal: abortRef.current.signal,
+        },
+      );
 
       if (data.scrapeId) {
-        setScrapeId(data.scrapeId);
-        if (data.metadata?.liveViewUrl) {
-          setLiveViewUrl(data.metadata.liveViewUrl);
+        setScrapeId(data.scrapeId as string);
+        const meta = data.metadata as Record<string, unknown> | undefined;
+        if (meta?.liveViewUrl) {
+          setLiveViewUrl(meta.liveViewUrl as string);
         }
         toast.success("Session started");
       } else {
@@ -58,10 +61,7 @@ export default function InteractPanel() {
         );
       }
     } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") return;
-      toast.error(
-        err instanceof Error ? err.message : "Failed to start session",
-      );
+      showApiError(err, "Failed to start session");
     } finally {
       setLoading(false);
     }
@@ -72,18 +72,19 @@ export default function InteractPanel() {
     setInteracting(true);
 
     try {
-      const res = await fetch(`/api/interact/${scrapeId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: prompt.trim() }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Interaction failed");
+      const data = await apiFetch<Record<string, unknown>>(
+        `/api/interact/${scrapeId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: prompt.trim() }),
+        },
+      );
       setResult(data);
       setPrompt("");
       toast.success("Interaction complete");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Interaction failed");
+      showApiError(err, "Interaction failed");
     } finally {
       setInteracting(false);
     }

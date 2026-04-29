@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useHistory } from "@/hooks/use-history";
+import { apiFetch, showApiError } from "@/lib/client-helpers";
 
 export default function ChangesPanel() {
   const [url, setUrl] = useState("");
@@ -31,22 +32,17 @@ export default function ChangesPanel() {
     abortRef.current = new AbortController();
 
     try {
-      const res = await fetch("/api/changes", {
+      const data = await apiFetch<Record<string, unknown>>("/api/changes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: url.trim() }),
         signal: abortRef.current.signal,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Change tracking failed");
       setResult(data);
       addEntry({ url }, url);
       toast.success("Change tracking complete");
     } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") return;
-      toast.error(
-        err instanceof Error ? err.message : "Change tracking failed",
-      );
+      showApiError(err, "Change tracking failed");
     } finally {
       setLoading(false);
     }

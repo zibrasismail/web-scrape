@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { useHistory } from "@/hooks/use-history";
+import { apiFetch, showApiError } from "@/lib/client-helpers";
 
 interface JobState {
   id: string;
@@ -57,15 +58,13 @@ export default function BatchPanel() {
     stopPolling();
 
     try {
-      const res = await fetch("/api/batch", {
+      const data = await apiFetch<Record<string, unknown>>("/api/batch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ urls }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Batch scrape failed");
 
-      const jobId = data.jobId;
+      const jobId = data.jobId as string;
       setJob({ id: jobId, status: "running" });
       toast.success("Batch scrape started");
       addEntry({ urls }, `${urls.length} URLs`);
@@ -86,7 +85,7 @@ export default function BatchPanel() {
         } catch {}
       }, 3000);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Batch scrape failed");
+      showApiError(err, "Batch scrape failed");
     } finally {
       setLoading(false);
     }

@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useHistory } from "@/hooks/use-history";
+import { apiFetch, showApiError } from "@/lib/client-helpers";
 
 const FORMAT_OPTIONS = [
   "markdown",
@@ -42,20 +43,17 @@ export default function ScrapePanel() {
     abortRef.current = new AbortController();
 
     try {
-      const res = await fetch("/api/scrape", {
+      const data = await apiFetch<Record<string, unknown>>("/api/scrape", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: url.trim(), formats }),
         signal: abortRef.current.signal,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Scrape failed");
       setResult(data);
       addEntry({ url, formats }, url);
       toast.success("Scrape complete");
     } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") return;
-      toast.error(err instanceof Error ? err.message : "Scrape failed");
+      showApiError(err, "Scrape failed");
     } finally {
       setLoading(false);
     }

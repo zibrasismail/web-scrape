@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { useHistory } from "@/hooks/use-history";
+import { apiFetch, showApiError } from "@/lib/client-helpers";
 
 interface JobState {
   id: string;
@@ -55,7 +56,7 @@ export default function CrawlPanel() {
     stopPolling();
 
     try {
-      const res = await fetch("/api/crawl", {
+      const data = await apiFetch<Record<string, unknown>>("/api/crawl", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -64,10 +65,8 @@ export default function CrawlPanel() {
           maxDiscoveryDepth: maxDepth,
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Crawl failed");
 
-      const jobId = data.jobId;
+      const jobId = data.jobId as string;
       setJob({ id: jobId, status: "running" });
       toast.success("Crawl started");
       addEntry({ url, limit, maxDepth }, url);
@@ -88,7 +87,7 @@ export default function CrawlPanel() {
         } catch {}
       }, 3000);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Crawl failed");
+      showApiError(err, "Crawl failed");
     } finally {
       setLoading(false);
     }

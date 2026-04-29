@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useHistory } from "@/hooks/use-history";
+import { apiFetch, showApiError } from "@/lib/client-helpers";
 
 export default function ExtractPanel() {
   const [urls, setUrls] = useState<string[]>([""]);
@@ -46,7 +47,7 @@ export default function ExtractPanel() {
         }
       }
 
-      const res = await fetch("/api/extract", {
+      const data = await apiFetch<Record<string, unknown>>("/api/extract", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -56,14 +57,11 @@ export default function ExtractPanel() {
         }),
         signal: abortRef.current.signal,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Extract failed");
       setResult(data);
       addEntry({ urls: cleanUrls, prompt }, cleanUrls.join(", "));
       toast.success("Extraction complete");
     } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") return;
-      toast.error(err instanceof Error ? err.message : "Extract failed");
+      showApiError(err, "Extract failed");
     } finally {
       setLoading(false);
     }
